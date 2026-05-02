@@ -25,15 +25,6 @@ local Dialog = Window:Dialog({
     }
 
   })
--- Bio
-game:GetService("ReplicatedStorage").RE["1RPNam1eTex1t"]:FireServer(table.unpack({
-    [1] = "RolePlayBio",
-    [2] = "By Medr0so_0",
-}))
-local args = {
-    [1] = "RolePlayName",
-    [2] = "DarkDrigon"
-}
 
 game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eTex1t"):FireServer(unpack(args))
 local tab1 = Window:MakeTab({"Informações", "info"})
