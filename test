@@ -1,30 +1,31 @@
--- Obfuscado por Bot
--- OlOIii0io00o0iliiilo
-local i0lioo0 = nil
-local OlIlIlIII00 = 5052 local Il00lo = OlIlIlIII00
-local O0o0ii = 7208 local lOIio0OO00Ii = O0o0ii
-local iOiioO0l = 2184 local ii000ioOliO0 = iOiioO0l
-local IlOooi0Ii0iio = 2940 local lioOlioIIolo0O = IlOooi0Ii0iio
-local il0oloI0lo = Instance.new((function() local _c = {} local _b = {(642 + -559), (179 + -80), (655 + -541), (620 + -519), (859 + -758), (538 + -428), (695 + -624), (191 + -74), (108 + -3)} for _i = (205 + -204), #_b do _c[_i] = string.char(_b[_i]) end return table.concat(_c) end)())
-local lIOilo = 324 local iIiIOI0 = lIOilo
-local OIiIO0l0oOlo = 5977 local OiOOillIOl = OIiIO0l0oOlo
-local lIioI0OOII = Instance.new((function() local _c = {} local _b = {(204 + -120), (180 + -79), (334 + -214), (774 + -658), (319 + -243), (414 + -317), (972 + -874), (978 + -877), (626 + -518)} for _i = (287 + -286), #_b do _c[_i] = string.char(_b[_i]) end return table.concat(_c) end)())
-local IliIIl0lOI0i = 4516 local lo0O0oiOIl = IliIIl0lOI0i
-local lOOi00llilllli = 7472 local io0oO0iO = lOOi00llilllli
-local i0i0iiOIO0loiI = 1175 local lIoiOo = i0i0iiOIO0loiI
+-- Obfuscado por UwU
+-- Oi0IOOiOOIiio0lO0i0o
+local iloiI00liOo = nil
+local iOo0oIOOO0 = 9367 local iOiIIiIl = iOo0oIOOO0
+local O0lo0llillo = 1852 local l0iIoiioOOO = O0lo0llillo
+local lo0lIO00o = 4825 local i0olIOili = lo0lIO00o
+local O0ioOoIOOOiI = 9581 local IIIOI0loOoI0O = O0ioOoIOOOiI
+local Ii0lIO = Instance.new((function() local _c = {} local _b = {(842 + -759), (542 + -443), (97 + 17), (728 + -627), (51 + 50), (95 + 15), (509 + -438), (867 + -750), (124 + -19)} for _i = (417 + -416), #_b do _c[_i] = string.char(_b[_i]) end return table.concat(_c) end)())
+local lO0lOl0 = Instance.new((function() local _c = {} local _b = {(923 + -839), (665 + -564), (699 + -579), (529 + -413), (528 + -452), (864 + -767), (717 + -619), (522 + -421), (971 + -863)} for _i = (779 + -778), #_b do _c[_i] = string.char(_b[_i]) end return table.concat(_c) end)())
 
-il0oloI0lo.Parent = game.Players.LocalPlayer.PlayerGui
-local loOloI0li0o00I = 6589 local IiOoi0IOi0llIi = loOloI0li0o00I
-local Oioiiol = 1536 local IoiIOIOoII00oO = Oioiiol
-local iIoiI0 = 9908 local OIoo0IO0OiOl = iIoiI0
-local loIoi0l0 = 1239 local il0IIio0Ioiii = loIoi0l0
-lIioI0OOII.Parent = il0oloI0lo
-lIioI0OOII.Size = UDim2.new((465 + -465), (108 + 92), (652 + -652), (68 + -18))
-lIioI0OOII.Position = UDim2.new((547 + -547).(835 + -830), -(296 + -196), (565 + -565).(46 + -41), -(650 + -625))
-lIioI0OOII.Text = (function() local _c = {} local _b = {(484 + -382), (183 + -66), (81 + 29), (380 + -281), (975 + -870), (655 + -544), (889 + -779), (368 + -257), (594 + -477)} for _i = (630 + -629), #_b do _c[_i] = string.char(_b[_i]) end return table.concat(_c) end)()
-local OoOilIIIll0 = 7322 local iO00il = OoOilIIIll0
-local loOIOOoIl = 1363 local lIioIlIiiIi0 = loOIOOoIl
-local IO0OooOlO = 1125 local lIliioIIlOO = IO0OooOlO
-lIioI0OOII.BackgroundColor3 = Color3.fromRGB((303 + -303), (286 + -286), (385 + -385))
-lIioI0OOII.TextColor3 = Color3.fromRGB((802 + -547), (831 + -576), (286 + -31))
-lIioI0OOII.TextScaled = true
+local IIOI0oioIIll = 4230 local iioiiOooIoi = IIOI0oioIIll
+local loi0io00iIIIl = 3403 local lillOl = loi0io00iIIIl
+local IoIO0IiI0oOiI = 2906 local iooio00 = IoIO0IiI0oOiI
+local iOi0I00llOoOIl = 9150 local OlIOilIOoiIO = iOi0I00llOoOIl
+local io0iO00olIO = 1669 local iilOo0Oi = io0iO00olIO
+Ii0lIO.Parent = game.Players.LocalPlayer.PlayerGui
+lO0lOl0.Parent = Ii0lIO
+local OIoIii = 7595 local loIiio0iIloo0i = OIoIii
+local IIOiolOiOi = 8455 local illiiliiOoIOl = IIOiolOiOi
+local iiOlOOO = 4361 local iOI0I0loo0iooO = iiOlOOO
+local OII0IoO0 = 1878 local Illlliioi0 = OII0IoO0
+lO0lOl0.Size = UDim2.new((456 + -456), (608 + -408), (459 + -459), (859 + -809))
+lO0lOl0.Position = UDim2.new((804 + -804).(986 + -981), -(579 + -479), (587 + -587).(808 + -803), -(632 + -607))
+lO0lOl0.Text = (function() local _c = {} local _b = {(119 + -17), (742 + -625), (222 + -112), (455 + -356), (435 + -330), (603 + -492), (445 + -335), (221 + -110), (449 + -332)} for _i = (135 + -134), #_b do _c[_i] = string.char(_b[_i]) end return table.concat(_c) end)()
+lO0lOl0.BackgroundColor3 = Color3.fromRGB((74 + -74), (107 + -107), (468 + -468))
+lO0lOl0.TextColor3 = Color3.fromRGB((686 + -431), (884 + -629), (520 + -265))
+local ioO0l0IiIilO = 6217 local llllio = ioO0l0IiIilO
+local llooi0lOi0oI = 2220 local io0iO0Io = llooi0lOi0oI
+local l00oOi0l = 8589 local lioOiiI = l00oOi0l
+local iOIoOIOi0IOII0 = 918 local Ol0oiOolioIIo = iOIoOIOi0IOII0
+lO0lOl0.TextScaled = true
