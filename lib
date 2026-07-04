@@ -1,0 +1,130 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+
+-- Remove caso já exista
+pcall(function()
+	Player.PlayerGui:FindFirstChild("BlackLib"):Destroy()
+end)
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "【..epic..】"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = Player.PlayerGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 420, 0, 280)
+Main.Position = UDim2.new(0.5, -210, 0.5, -140)
+Main.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Main.BorderColor3 = Color3.fromRGB(255,255,255)
+Main.BorderSizePixel = 2
+Main.Parent = ScreenGui
+
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1,0,0,32)
+TopBar.BackgroundColor3 = Color3.fromRGB(15,15,15)
+TopBar.BorderColor3 = Color3.fromRGB(255,255,255)
+TopBar.BorderSizePixel = 2
+TopBar.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1,-70,1,0)
+Title.Position = UDim2.new(0,10,0,0)
+Title.Text = "Black Library"
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
+
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.new(0,30,0,30)
+Minimize.Position = UDim2.new(1,-65,0,1)
+Minimize.Text = "-"
+Minimize.TextColor3 = Color3.new(1,1,1)
+Minimize.Font = Enum.Font.GothamBold
+Minimize.TextSize = 22
+Minimize.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Minimize.BorderColor3 = Color3.fromRGB(255,255,255)
+Minimize.Parent = TopBar
+
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0,30,0,30)
+Close.Position = UDim2.new(1,-33,0,1)
+Close.Text = "×"
+Close.TextColor3 = Color3.new(1,1,1)
+Close.Font = Enum.Font.GothamBold
+Close.TextSize = 22
+Close.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Close.BorderColor3 = Color3.fromRGB(255,255,255)
+Close.Parent = TopBar
+
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1,-10,1,-42)
+Content.Position = UDim2.new(0,5,0,37)
+Content.BackgroundTransparency = 1
+Content.Parent = Main
+
+-- Arrastar
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+TopBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or
+		input.UserInputType == Enum.UserInputType.Touch then
+
+		dragging = true
+		dragStart = input.Position
+		startPos = Main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+TopBar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or
+		input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		Main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Minimizar
+local minimized = false
+
+Minimize.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	Content.Visible = not minimized
+
+	if minimized then
+		Main.Size = UDim2.new(0,420,0,32)
+		Minimize.Text = "+"
+	else
+		Main.Size = UDim2.new(0,420,0,280)
+		Minimize.Text = "-"
+	end
+end)
+
+-- Fechar
+Close.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)

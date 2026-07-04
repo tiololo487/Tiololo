@@ -1,0 +1,7 @@
+local Players = game:GetService("players")
+local TweenService = game:GetService ("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local StarterGui = game:GetService("StarterGui")
+local lp = Players.LocalPlayer
+
+local redzlib = 
