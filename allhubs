@@ -93,3 +93,33 @@ Tab2:Button({
         safeLoad("https://raw.githubusercontent.com/nxvap/Hexagon/main/brookhaven")
     end
 })
+
+local tab3 = Window:Tab({
+    Title = "Forsaken",
+    Icon = "moon"
+})
+
+Tab3:Button({
+    Title = "Guesting hub 1°",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/LolnotaKid/project/refs/heads/main/AutoBLOCKKKWAHV1")
+        
+Tab3:Button({
+    Title = "Ringta hub",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/34f3f/forsaken.github.io/refs/heads/main/ringtabublik.lua")
+        
+Tab3:Button({
+    Title = "Fartsaken",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/ivannetta/ShitScripts/refs/heads/main/forsaken.lua")
+        
+Tab3:Button({
+    Title = "Yameme hub",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/MBHubRoblox/YamemeHub/refs/heads/main/forsakenscript.lua")
+        
+Tab3:Button({
+    Title = "CursedSaken",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/zxcursedsocute/Forsaken-Script/refs/heads/main/lua")
