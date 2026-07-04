@@ -1,0 +1,98 @@
+local WindUI = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"
+))()
+
+local Window = WindUI:CreateWindow({
+    Title = "divulgador",
+    Icon = "zap",
+    Theme = "Dark",
+    Size = UDim2.fromOffset(400, 300),
+    Resizable = false
+})
+
+
+local Tab = Window:CreateTab({
+    Title = "Discord dumpers/deobfuscadores",
+    Icon = "home"
+})
+
+Tab:CreateButton({
+    Title = "Speack🔥",
+    Callback = function()
+      setclipboard("https://discord.gg/6DuSrRhjn")
+    end
+})
+
+Tab:CreateButton({
+    Title = "Lunar🌙",
+    Callback = function()
+        setclipboard("https://discord.gg/r2yxkbbUp")
+    end
+})
+
+Tab:CreateButton({
+    Title = "Catmio",
+    Callback = function()
+      setclipboard("https://discord.gg/ja6zGhQQ2")
+    end
+})
+
+Tab:CreateButton({
+    Title = "Neon X hub💙",
+    Callback = function()
+      setclipboard("https://discord.gg/NXHHzUkJx")
+    end
+})
+
+Tab:CreateButton({
+    Title = "69ms",
+    Callback = function()
+     setclipboard("https://discord.gg/s5mha6Mjh")
+    end
+})
+
+Tab:CreateButton({
+    Title = "25ms",
+    Callback = function()
+    setclipboard("https://discord.gg/25ms")
+    end
+})
+
+Tab:CreateButton({
+    Title = "Nova hu",
+    Callback = function()
+      setclipboard("https://discord.gg/jqksvbNcr")
+    end
+})
+
+local Tab2 = Window:CreateTab({
+    Title = "Brookhaven",
+    Icon = "moon"
+    
+    Tab2:CreateButton({
+    Title = " Spectra Hub",
+    Callback = function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Spectra-Hub-193872"))()
+    end
+})
+
+Tab2:CreateButton({
+    Title = "Lyra Hub top1 Troll (minha opinião)",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/kayrus999/Lyrapainel/refs/heads/main/Lyrabrookhaven"))()
+    end
+})
+
+Tab2:CreateButton({
+    Title = KitKat",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KitUserss/carregamento/refs/heads/main/carregamento"))()
+    end
+})
+
+Tab2:CreateButton({
+    Title = "Dark hub",
+    Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KitUserss/DarkHub/refs/heads/main/carregamento"))()
+    end
+})
