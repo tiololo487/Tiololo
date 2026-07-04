@@ -4,4 +4,4 @@ local CoreGui = game:GetService("CoreGui")
 local StarterGui = game:GetService("StarterGui")
 local lp = Players.LocalPlayer
 
-local redzlib = 
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tiololo487/Tiololo/refs/heads/main/lib"))()
