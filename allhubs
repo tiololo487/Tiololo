@@ -1,97 +1,88 @@
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"
+repeat task.wait() until game:IsLoaded()
+task.wait(1)
+
+local WindUI = loadstring(game:HttpGet(
+    "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
 ))()
 
+if not WindUI then
+    warn("WindUI não carregou")
+    return
+end
+
+----------------------------------------------------
+-- WINDOW
+----------------------------------------------------
 local Window = WindUI:CreateWindow({
     Title = "『ÄŁŁḤŰƁ§』",
     Icon = "zap",
     Theme = "Dark",
-    Size = UDim2.fromOffset(400, 300),
-    Resizable = false
+    Folder = "ALLHUBS"
 })
 
-
-local Tab = Window:CreateTab({
+----------------------------------------------------
+-- TAB 1: DISCORD LINKS
+----------------------------------------------------
+local Tab = Window:Tab({
     Title = "Discord dumpers/deobfuscadores",
     Icon = "home"
 })
 
-Tab:CreateButton({
-    Title = "Speack🔥",
-    Callback = function()
-      setclipboard("https://discord.gg/6DuSrRhjn")
-    end
-})
+local function addButton(name, link)
+    Tab:Button({
+        Title = name,
+        Callback = function()
+            setclipboard(link)
+        end
+    })
+end
 
-Tab:CreateButton({
-    Title = "Lunar🌙",
-    Callback = function()
-        setclipboard("https://discord.gg/r2yxkbbUp")
-    end
-})
+addButton("Speack🔥", "https://discord.gg/6DuSrRhjn")
+addButton("Lunar🌙", "https://discord.gg/r2yxkbbUp")
+addButton("Catmio", "https://discord.gg/ja6zGhQQ2")
+addButton("Neon X hub💙", "https://discord.gg/NXHHzUkJx")
+addButton("69ms", "https://discord.gg/s5mha6Mjh")
+addButton("25ms", "https://discord.gg/25ms")
+addButton("Nova hub", "https://discord.gg/jqksvbNcr")
 
-Tab:CreateButton({
-    Title = "Catmio",
-    Callback = function()
-      setclipboard("https://discord.gg/ja6zGhQQ2")
-    end
-})
-
-Tab:CreateButton({
-    Title = "Neon X hub💙",
-    Callback = function()
-      setclipboard("https://discord.gg/NXHHzUkJx")
-    end
-})
-
-Tab:CreateButton({
-    Title = "69ms",
-    Callback = function()
-     setclipboard("https://discord.gg/s5mha6Mjh")
-    end
-})
-
-Tab:CreateButton({
-    Title = "25ms",
-    Callback = function()
-    setclipboard("https://discord.gg/25ms")
-    end
-})
-
-Tab:CreateButton({
-    Title = "Nova hu",
-    Callback = function()
-      setclipboard("https://discord.gg/jqksvbNcr")
-    end
-})
-
-local Tab2 = Window:CreateTab({
+----------------------------------------------------
+-- TAB 2: BROOKHAVEN
+----------------------------------------------------
+local Tab2 = Window:Tab({
     Title = "Brookhaven",
     Icon = "moon"
-    
-    Tab2:CreateButton({
-    Title = " Spectra Hub",
+})
+
+local function safeLoad(url)
+    pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+end
+
+Tab2:Button({
+    Title = "Spectra Hub",
     Callback = function()
-    loadstring(game:HttpGet("https://rawscripts.net/raw/Brookhaven-RP-Spectra-Hub-193872"))()
+        safeLoad("https://rawscripts.net/raw/Brookhaven-RP-Spectra-Hub-193872")
     end
 })
 
-Tab2:CreateButton({
-    Title = "Lyra Hub top1 Troll (minha opinião)",
+Tab2:Button({
+    Title = "Lyra Hub",
     Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/kayrus999/Lyrapainel/refs/heads/main/Lyrabrookhaven"))()
+        safeLoad("https://raw.githubusercontent.com/kayrus999/Lyrapainel/refs/heads/main/Lyrabrookhaven")
     end
 })
 
-Tab2:CreateButton({
-    Title = KitKat",
+Tab2:Button({
+    Title = "KitKat",
     Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/KitUserss/carregamento/refs/heads/main/carregamento"))()
+        safeLoad("https://raw.githubusercontent.com/KitUserss/carregamento/refs/heads/main/carregamento")
     end
 })
 
-Tab2:CreateButton({
-    Title = "Dark hub",
+Tab2:Button({
+    Title = "Dark Hub",
     Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/KitUserss/DarkHub/refs/heads/main/carregamento"))()
+        safeLoad("https://raw.githubusercontent.com/KitUserss/DarkHub/refs/heads/main/carregamento")
     end
 })
