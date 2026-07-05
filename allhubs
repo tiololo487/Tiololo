@@ -103,17 +103,23 @@ Tab3:Button({
     Title = "Guesting hub 1°",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/LolnotaKid/project/refs/heads/main/AutoBLOCKKKWAHV1")
-        
+        end
+    )}
+    
 Tab3:Button({
     Title = "Ringta hub",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/34f3f/forsaken.github.io/refs/heads/main/ringtabublik.lua")
-        
+        end
+    )}
+    
 Tab3:Button({
     Title = "Fartsaken",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/ivannetta/ShitScripts/refs/heads/main/forsaken.lua")
-        
+        end
+    )}
+    
 Tab3:Button({
     Title = "Yameme hub",
     Callback = function()
@@ -123,22 +129,52 @@ Tab3:Button({
     Title = "CursedSaken",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/zxcursedsocute/Forsaken-Script/refs/heads/main/lua")
-        
+        end
+    )}
+    
 local tab4 = Window:Tab({
     Title = "Blox Fruit",
     Icon = "moon"
+  end
+)}
     
 Tab4:Button({
     Title = "Redz hub (come back)",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/realredz999/NewRedz/main/main.lua")
-        
+        end
+    )}
+    
 Tab4:Button({
     Title = "Blue x Hub",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua")
-        
+        end
+    )}
+    
 Tab4:Button({
     Title = "Quantum onyx Hub",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua")
+        end
+    )}
+    
+local tab5 = Window:Tab({
+    Title = "Grow a Garden 2",
+    Icon = "moon"
+  end
+)}
+
+Tab5:Button({
+    Title = "Lumin Hub",
+    Callback = function()
+        safeLoad("https://api.luarmor.net/files/v4/loaders/795c7accd08487171484e54a92e75c77.lua")
+        end
+    )}
+        
+Tab5:Button({
+    Title = "Axonic hub",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/Kenniel123/Grow-A-Garden-2/refs/heads/main/Grow%20A%20Garden%202")
+        end
+    )}
