@@ -123,3 +123,22 @@ Tab3:Button({
     Title = "CursedSaken",
     Callback = function()
         safeLoad("https://raw.githubusercontent.com/zxcursedsocute/Forsaken-Script/refs/heads/main/lua")
+        
+local tab4 = Window:Tab({
+    Title = "Blox Fruit",
+    Icon = "moon"
+    
+Tab4:Button({
+    Title = "Redz hub (come back)",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/realredz999/NewRedz/main/main.lua")
+        
+Tab4:Button({
+    Title = "Blue x Hub",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua")
+        
+Tab4:Button({
+    Title = "Quantum onyx Hub",
+    Callback = function()
+        safeLoad("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua")
