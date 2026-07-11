@@ -1,0 +1,2161 @@
+repeat task.wait() until game:IsLoaded()
+task.wait(1)
+
+local WindUI = loadstring(game:HttpGet(
+    "https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"
+))()
+
+if not WindUI then
+    warn("WindUI não carregou")
+    return
+end
+
+----------------------------------------------------
+-- SERVICES
+----------------------------------------------------
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+----------------------------------------------------
+-- WINDOW
+----------------------------------------------------
+local Window = WindUI:CreateWindow({
+    Title = "LYRA HUB — BROOKHAVEN",
+    Icon = "zap",
+    Theme = "Dark",
+    Folder = "LYRA_HUB"
+})
+
+-- Criar todas as Tabs
+local InfoTab = Window:Tab({ Title = "Info", Icon = "info" })
+local ProtecoesTab = Window:Tab({ Title = "Protecoes", Icon = "shield" })
+local LagServerTab = Window:Tab({ Title = "Lag Server", Icon = "cpu" })
+local ToolsTab = Window:Tab({ Title = "Tools", Icon = "wrench" })
+local CoresTab = Window:Tab({ Title = "Cores", Icon = "palette" })
+local AvatarTab = Window:Tab({ Title = "Avatar", Icon = "user" })
+local GamepassTab = Window:Tab({ Title = "Gamepass", Icon = "star" })
+local CarTab = Window:Tab({ Title = "Car", Icon = "car" })
+local PropsTab = Window:Tab({ Title = "Props", Icon = "box" })
+local ConfigFlingsTab = Window:Tab({ Title = "Config Flings", Icon = "rocket" })
+local StalkingTab = Window:Tab({ Title = "Stalking", Icon = "eye" })
+local ScriptsTab = Window:Tab({ Title = "Scripts", Icon = "code" })
+local AnimationsTab = Window:Tab({ Title = "Animations", Icon = "film" })
+local ScriptsFeTab = Window:Tab({ Title = "Scripts FE", Icon = "cloud" })
+local SoundsTab = Window:Tab({ Title = "Sounds", Icon = "music" })
+local TeleportsTab = Window:Tab({ Title = "Teleports", Icon = "map-pin" })
+local ShadersTab = Window:Tab({ Title = "Shaders", Icon = "sun" })
+
+-- ============================================
+-- VARIÁVEIS GLOBAIS
+-- ============================================
+getgenv().LyraHub = {
+    Target = nil,
+    AntiToolAllActive = false,
+    AntiToolSingleActive = false,
+    flingCouchFastActiveAll = false,
+    flingCanoaActiveAll = false,
+    flingBoatActiveAll = false,
+    flingBoatV2ActiveAll = false,
+    glitchFlingCouchActiveAll = false,
+    rgbSpeed = 1,
+    carSpeed = 25,
+    audioSelectedMusic = nil,
+    selectedFireColor = "White",
+    selectedSmokeColor = "White",
+    parteSelecionada = "Tronco",
+    selectedParts = {
+        Torso = nil,
+        BracoDireito = nil,
+        BracoEsquerdo = nil,
+        PernaDireita = nil,
+        PernaEsquerda = nil,
+        Cabeca = nil
+    }
+}
+
+-- ============================================
+-- FUNÇÕES AUXILIARES
+-- ============================================
+
+local function getPlayerList()
+    local players = {}
+    local allPlayers = Players:GetPlayers()
+    for _, player in ipairs(allPlayers) do
+        if player ~= LocalPlayer then
+            table.insert(players, player.Name)
+        end
+    end
+    if #players == 0 then
+        table.insert(players, "Nenhum jogador")
+    end
+    return players
+end
+
+local function getHRP(player)
+    if player and player.Character then
+        return player.Character:FindFirstChild("HumanoidRootPart")
+    end
+    return nil
+end
+
+local function getHumanoid(player)
+    if player and player.Character then
+        return player.Character:FindFirstChildOfClass("Humanoid")
+    end
+    return nil
+end
+
+local function getRE()
+    local re = ReplicatedStorage:FindFirstChild("RE")
+    if re then return re end
+    return nil
+end
+
+local function getRemotes()
+    local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+    if remotes then return remotes end
+    return nil
+end
+
+-- ============================================
+-- FUNÇÕES DE FLING/BRING/KILL
+-- ============================================
+
+local function flingWithCouch(targetPlayer)
+    if not targetPlayer then return end
+    local localChar = LocalPlayer.Character
+    if not localChar then return end
+    
+    local localHRP = localChar:FindFirstChild("HumanoidRootPart")
+    local targetHRP = getHRP(targetPlayer)
+    
+    if not localHRP or not targetHRP then return end
+    
+    local re = getRE()
+    if re then
+        local clearTools = re:FindFirstChild("1Clea1rTool1s")
+        if clearTools then
+            clearTools:FireServer("ClearAllTools")
+        end
+    end
+    
+    task.wait(0.3)
+    
+    if re then
+        local toolEvent = re:FindFirstChild("1Too1l")
+        if toolEvent then
+            toolEvent:InvokeServer("PickingTools", "Couch")
+        end
+    end
+    
+    local couch = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+    if couch and couch.Name == "Couch" then
+        couch.Parent = localChar
+    end
+    
+    Workspace.FallenPartsDestroyHeight = -math.huge
+    
+    local bv = Instance.new("BodyVelocity")
+    bv.Velocity = Vector3.new(900000000, 900000000, 900000000)
+    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bv.Parent = localHRP
+    
+    local humanoid = localChar:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+        humanoid.PlatformStand = false
+    end
+    
+    local angle = 0
+    for i = 1, 15 do
+        if not targetHRP or not targetHRP.Parent then break end
+        if localHRP.Position.Y >= 70000 then break end
+        
+        angle = angle + 30
+        localHRP.CFrame = CFrame.new(targetHRP.Position + Vector3.new(0, 1, 0)) * CFrame.Angles(math.rad(angle), 0, 0)
+        localHRP.Velocity = Vector3.new(900000000, 900000000, 900000000)
+        localHRP.RotVelocity = Vector3.new(900000000, 900000000, 900000000)
+        
+        task.wait(0.05)
+    end
+    
+    bv:Destroy()
+    
+    if humanoid then
+        humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+        humanoid.PlatformStand = false
+    end
+    
+    if re then
+        local clearTools = re:FindFirstChild("1Clea1rTool1s")
+        if clearTools then
+            clearTools:FireServer("ClearAllTools")
+        end
+    end
+end
+
+local function flingWithBall(targetPlayer)
+    if not targetPlayer then return end
+    local localChar = LocalPlayer.Character
+    if not localChar then return end
+    
+    local localHRP = localChar:FindFirstChild("HumanoidRootPart")
+    local targetHRP = getHRP(targetPlayer)
+    
+    if not localHRP or not targetHRP then return end
+    
+    local re = getRE()
+    if re then
+        local toolEvent = re:FindFirstChild("1Too1l")
+        if toolEvent then
+            toolEvent:InvokeServer("PickingTools", "SoccerBall")
+        end
+    end
+    
+    task.wait(0.5)
+    
+    local ball = LocalPlayer.Backpack:FindFirstChild("SoccerBall")
+    if ball then
+        ball.Parent = localChar
+    end
+    
+    local soccerBall = Workspace:FindFirstChild("Soccer" .. LocalPlayer.Name)
+    if soccerBall then
+        soccerBall.Name = "ShieldBall"
+        soccerBall.CanCollide = false
+        soccerBall.Massless = true
+        soccerBall.CustomPhysicalProperties = PhysicalProperties.new(0.0001, 0, 0)
+        
+        local bv = Instance.new("BodyVelocity")
+        bv.Velocity = Vector3.new(900000000, 900000000, 900000000)
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bv.Parent = soccerBall
+        
+        task.wait(2)
+        bv:Destroy()
+    end
+end
+
+local function flingWithBoat(targetPlayer)
+    if not targetPlayer then return end
+    -- Implementação simplificada
+    flingWithCouch(targetPlayer)
+end
+
+local function bringPlayer(targetPlayer)
+    if not targetPlayer then return end
+    local localChar = LocalPlayer.Character
+    if not localChar then return end
+    
+    local localHRP = localChar:FindFirstChild("HumanoidRootPart")
+    local targetHRP = getHRP(targetPlayer)
+    
+    if not localHRP or not targetHRP then return end
+    
+    targetHRP.CFrame = localHRP.CFrame * CFrame.new(0, 0, -3)
+end
+
+local function goToPlayer(targetPlayer)
+    if not targetPlayer then return end
+    local localChar = LocalPlayer.Character
+    if not localChar then return end
+    
+    local localHRP = localChar:FindFirstChild("HumanoidRootPart")
+    local targetHRP = getHRP(targetPlayer)
+    
+    if not localHRP or not targetHRP then return end
+    
+    localHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 3)
+end
+
+local function killPlayer(targetPlayer)
+    flingWithCouch(targetPlayer)
+end
+
+local function clearAllTools()
+    local re = getRE()
+    if re then
+        local clearTools = re:FindFirstChild("1Clea1rTool1s")
+        if clearTools then
+            clearTools:FireServer("ClearAllTools")
+        end
+    end
+end
+
+local function giveTool(toolName)
+    local re = getRE()
+    if re then
+        local toolEvent = re:FindFirstChild("1Too1l")
+        if toolEvent then
+            toolEvent:InvokeServer("PickingTools", toolName)
+        end
+    end
+end
+
+-- ============================================
+-- FUNÇÕES DE AVATAR
+-- ============================================
+
+local function changeCharacterBody(parts)
+    local remotes = getRemotes()
+    if remotes then
+        local changeEvent = remotes:FindFirstChild("ChangeCharacterBody")
+        if changeEvent then
+            changeEvent:InvokeServer(parts)
+        end
+    end
+end
+
+local function resetCharacter()
+    local remotes = getRemotes()
+    if remotes then
+        local resetEvent = remotes:FindFirstChild("ResetCharacterAppearance")
+        if resetEvent then
+            resetEvent:FireServer()
+        end
+    end
+end
+
+local function wearAccessory(assetId)
+    local remotes = getRemotes()
+    if remotes then
+        local wearEvent = remotes:FindFirstChild("Wear")
+        if wearEvent then
+            wearEvent:InvokeServer(assetId)
+        end
+    end
+end
+
+local function applyEmmiter(id, code)
+    local remotes = getRemotes()
+    if remotes then
+        local applyEvent = remotes:FindFirstChild("ApplyEmmiter")
+        if applyEvent then
+            applyEvent:InvokeServer(id, code)
+        end
+    end
+end
+
+-- ============================================
+-- INFO TAB
+-- ============================================
+
+InfoTab:Section({ Title = "Informações" })
+
+InfoTab:Paragraph({
+    Title = "LYRA HUB",
+    Content = "by kayrus999 & luna\nVersão: 2.0\nJogo: Brookhaven"
+})
+
+InfoTab:Paragraph({
+    Title = "Informações do Jogador",
+    Content = function()
+        return "Nickname: " .. LocalPlayer.Name .. "\nUserId: " .. LocalPlayer.UserId
+    end
+})
+
+InfoTab:Paragraph({
+    Title = "Status do Servidor",
+    Content = function()
+        return "Jogadores: " .. #Players:GetPlayers() .. "/" .. Players.MaxPlayers
+    end
+})
+
+InfoTab:Section({ Title = "Links" })
+InfoTab:Paragraph({
+    Title = "Discord",
+    Content = "https://discord.gg/x3emNZRjPV"
+})
+
+-- ============================================
+-- PROTEÇÕES TAB
+-- ============================================
+
+local antiToolTarget = nil
+local antiToolConnection = nil
+local antiSitActive = false
+local antiVoidActive = false
+local antiLagActive = false
+
+ProtecoesTab:Section({ Title = "Anti Tool" })
+
+local antiToolDropdown = ProtecoesTab:Dropdown({
+    Title = "Target",
+    Options = getPlayerList(),
+    Default = "",
+    Callback = function(name)
+        if name ~= "Nenhum jogador" then
+            antiToolTarget = name
+        else
+            antiToolTarget = nil
+        end
+    end
+})
+
+ProtecoesTab:Button({
+    Title = "Atualizar Lista",
+    Callback = function()
+        local newList = getPlayerList()
+        pcall(function() antiToolDropdown:Refresh(newList) end)
+    end
+})
+
+ProtecoesTab:Toggle({
+    Title = "Anti Tool Player",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.AntiToolSingleActive = state
+        if state then
+            if not antiToolTarget or antiToolTarget == "" then return end
+            antiToolConnection = RunService.Heartbeat:Connect(function()
+                if getgenv().LyraHub.AntiToolSingleActive then
+                    local target = Players:FindFirstChild(antiToolTarget)
+                    if target then
+                        clearAllTools()
+                    end
+                end
+            end)
+        else
+            if antiToolConnection then
+                antiToolConnection:Disconnect()
+                antiToolConnection = nil
+            end
+        end
+    end
+})
+
+ProtecoesTab:Toggle({
+    Title = "Anti Tool All Players",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.AntiToolAllActive = state
+        if state then
+            antiToolConnection = RunService.Heartbeat:Connect(function()
+                if getgenv().LyraHub.AntiToolAllActive then
+                    for _, player in ipairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer then
+                            clearAllTools()
+                        end
+                    end
+                end
+            end)
+        else
+            if antiToolConnection then
+                antiToolConnection:Disconnect()
+                antiToolConnection = nil
+            end
+        end
+    end
+})
+
+ProtecoesTab:Section({ Title = "Proteções" })
+
+ProtecoesTab:Toggle({
+    Title = "Anti Collision",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    if LocalPlayer.Character then
+                        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.CanCollide = false
+                            end
+                        end
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+ProtecoesTab:Toggle({
+    Title = "Anti Sit",
+    Default = false,
+    Callback = function(state)
+        antiSitActive = state
+        if state then
+            task.spawn(function()
+                while antiSitActive do
+                    if LocalPlayer.Character then
+                        local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                        if humanoid then
+                            humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+                        end
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        else
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+                end
+            end
+        end
+    end
+})
+
+ProtecoesTab:Toggle({
+    Title = "Anti Void",
+    Default = false,
+    Callback = function(state)
+        antiVoidActive = state
+        if state then
+            Workspace.FallenPartsDestroyHeight = -math.huge
+        else
+            Workspace.FallenPartsDestroyHeight = -500
+        end
+    end
+})
+
+ProtecoesTab:Toggle({
+    Title = "Anti Lag Server",
+    Default = false,
+    Callback = function(state)
+        antiLagActive = state
+        if state then
+            -- Tentar reduzir lag
+            for _, part in ipairs(Workspace:GetDescendants()) do
+                if part:IsA("BasePart") and part.Material ~= Enum.Material.Air then
+                    part.Material = Enum.Material.SmoothPlastic
+                end
+            end
+        end
+    end
+})
+
+-- ============================================
+-- LAG SERVER TAB
+-- ============================================
+
+LagServerTab:Section({ Title = "Bombas" })
+
+LagServerTab:Button({
+    Title = "Pegar Bombas",
+    Callback = function()
+        local re = getRE()
+        if re then
+            local toolEvent = re:FindFirstChild("1Too1l")
+            if toolEvent then
+                toolEvent:InvokeServer("PickingTools", "Bomb")
+            end
+        end
+    end
+})
+
+LagServerTab:Toggle({
+    Title = "Spam Bombas",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                local re = getRE()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    if re then
+                        local bombEvent = re:FindFirstChild("1Blo1wBomb1sServe1r")
+                        if bombEvent then
+                            bombEvent:FireServer("Bomb" .. LocalPlayer.Name)
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+LagServerTab:Button({
+    Title = "Explodir Bombas",
+    Callback = function()
+        local re = getRE()
+        if re then
+            local bombEvent = re:FindFirstChild("1Blo1wBomb1sServe1r")
+            if bombEvent then
+                bombEvent:FireServer("Bomb" .. LocalPlayer.Name)
+            end
+        end
+    end
+})
+
+LagServerTab:Section({ Title = "Snipers" })
+
+LagServerTab:Toggle({
+    Title = "Spam Sniper",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                local re = getRE()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    if re then
+                        local sniperEvent = re:FindFirstChild("1Blo1wSniper1sServe1r")
+                        if sniperEvent then
+                            sniperEvent:FireServer("Sniper" .. LocalPlayer.Name)
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+LagServerTab:Section({ Title = "Outros" })
+
+LagServerTab:Toggle({
+    Title = "Spam Card",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                local re = getRE()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    if re then
+                        local cardEvent = re:FindFirstChild("1Giv1eAnimatio1nTool1s")
+                        if cardEvent then
+                            cardEvent:FireServer("GiveCreditCard", "CreditCardBoy")
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+-- ============================================
+-- TOOLS TAB
+-- ============================================
+
+ToolsTab:Section({ Title = "Tools" })
+
+local tools = {
+    "Glider", "Cannon", "GoldenBasketball", "Water Balloon", 
+    "EggLauncher", "Scythe", "UraniumRod", "Chainsaw", 
+    "Snowboard", "Skis", "MoneyGun", "Couch", "Bomb"
+}
+
+for _, toolName in ipairs(tools) do
+    ToolsTab:Button({
+        Title = toolName,
+        Callback = function()
+            giveTool(toolName)
+        end
+    })
+end
+
+ToolsTab:Button({
+    Title = "Telekiness V5",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/BRENOPOOF/fe-telekinessv5/refs/heads/main/Main.txt"))()
+    end
+})
+
+-- ============================================
+-- CORES TAB (RGB)
+-- ============================================
+
+CoresTab:Section({ Title = "Configurações RGB" })
+
+CoresTab:TextBox({
+    Title = "Velocidade RGB",
+    Default = "1",
+    Callback = function(value)
+        local speed = tonumber(value)
+        if speed and speed > 0 then
+            getgenv().LyraHub.rgbSpeed = speed
+        end
+    end
+})
+
+CoresTab:Section({ Title = "RGB - Ativar" })
+
+local function rgbLoop(eventName, fireMethod)
+    task.spawn(function()
+        local re = getRE()
+        while getgenv().LyraHub.AntiToolSingleActive do
+            if re then
+                local colorEvent = re:FindFirstChild(eventName)
+                if colorEvent then
+                    local color = Color3.fromHSV(tick() * (getgenv().LyraHub.rgbSpeed or 1) % 5 / 5, 1, 1)
+                    if fireMethod == "FireServer" then
+                        colorEvent:FireServer(color)
+                    elseif fireMethod == "InvokeServer" then
+                        colorEvent:InvokeServer(color)
+                    else
+                        colorEvent:FireServer("PickingRPNameColor", color)
+                    end
+                end
+            end
+            task.wait(0.05)
+        end
+    end)
+end
+
+CoresTab:Toggle({
+    Title = "Nome RGB",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.AntiToolSingleActive = state
+        if state then rgbLoop("1RPNam1eColo1r", "FireServer") end
+    end
+})
+
+CoresTab:Toggle({
+    Title = "Bio RGB",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.AntiToolSingleActive = state
+        if state then rgbLoop("1RPNam1eColo1r", "PickingRPBioColor") end
+    end
+})
+
+CoresTab:Toggle({
+    Title = "Casa RGB",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.AntiToolSingleActive = state
+        if state then rgbLoop("1Player1sHous1e", "ColorPickHouse") end
+    end
+})
+
+CoresTab:Toggle({
+    Title = "Carro RGB",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.AntiToolSingleActive = state
+        if state then rgbLoop("1Player1sCa1r", "PickingCarColor") end
+    end
+})
+
+CoresTab:Toggle({
+    Title = "Bicicleta RGB",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.AntiToolSingleActive = state
+        if state then rgbLoop("1Player1sCa1r", "NoMotorColor") end
+    end
+})
+
+CoresTab:Toggle({
+    Title = "Radio RGB",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    pcall(function()
+                        local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+                        if playerGui then
+                            local toolGui = playerGui:FindFirstChild("ToolGui")
+                            if toolGui then
+                                local settings = toolGui:FindFirstChild("ToolSettings")
+                                if settings then
+                                    settings = settings:FindFirstChild("Settings")
+                                    if settings then
+                                        local propsColor = settings:FindFirstChild("PropsColor")
+                                        if propsColor then
+                                            local setColor = propsColor:FindFirstChild("SetColor")
+                                            if setColor then
+                                                local color = Color3.fromHSV(tick() * (getgenv().LyraHub.rgbSpeed or 1) % 5 / 5, 1, 1)
+                                                setColor:FireServer(color)
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                    task.wait(0.05)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+CoresTab:Toggle({
+    Title = "Megafone RGB",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    pcall(function()
+                        local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+                        if playerGui then
+                            local toolGui = playerGui:FindFirstChild("ToolGui")
+                            if toolGui then
+                                local settings = toolGui:FindFirstChild("ToolSettings")
+                                if settings then
+                                    settings = settings:FindFirstChild("Settings")
+                                    if settings then
+                                        local propsColor = settings:FindFirstChild("PropsColor")
+                                        if propsColor then
+                                            local setColor = propsColor:FindFirstChild("SetColor")
+                                            if setColor then
+                                                local color = Color3.fromHSV(tick() * (getgenv().LyraHub.rgbSpeed or 1) % 5 / 5, 1, 1)
+                                                setColor:FireServer(color)
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                    task.wait(0.1)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+-- ============================================
+-- AVATAR TAB
+-- ============================================
+
+AvatarTab:Section({ Title = "Copy Avatar" })
+
+local targetAvatarPlayer = nil
+
+local avatarDropdown = AvatarTab:Dropdown({
+    Title = "Players",
+    Options = getPlayerList(),
+    Default = "",
+    Callback = function(name)
+        if name ~= "Nenhum jogador" then
+            targetAvatarPlayer = name
+        end
+    end
+})
+
+AvatarTab:Button({
+    Title = "Atualizar Lista",
+    Callback = function()
+        local newList = getPlayerList()
+        pcall(function() avatarDropdown:Refresh(newList) end)
+    end
+})
+
+AvatarTab:Button({
+    Title = "Copy Avatar",
+    Callback = function()
+        if not targetAvatarPlayer or targetAvatarPlayer == "" then return end
+        local target = Players:FindFirstChild(targetAvatarPlayer)
+        if not target or not target.Character then return end
+        
+        -- Tenta carregar outfit code
+        local remotes = getRemotes()
+        if remotes then
+            local outfitEvent = remotes:FindFirstChild("AvatarEditorOutfitCodes")
+            if outfitEvent then
+                outfitEvent:InvokeServer("Load", "BH-AE-a86898900ec74a2b8d58cb31a3d44e5e")
+            end
+        end
+    end
+})
+
+AvatarTab:Section({ Title = "Partes do Corpo" })
+
+AvatarTab:TextBox({
+    Title = "ID do Tronco",
+    PlaceholderText = "Digite o ID",
+    Callback = function(value)
+        if value ~= "" then
+            getgenv().LyraHub.selectedParts.Torso = tonumber(value) or 0
+        else
+            getgenv().LyraHub.selectedParts.Torso = nil
+        end
+    end
+})
+
+AvatarTab:TextBox({
+    Title = "ID do Braço Direito",
+    PlaceholderText = "Digite o ID",
+    Callback = function(value)
+        if value ~= "" then
+            getgenv().LyraHub.selectedParts.BracoDireito = tonumber(value) or 0
+        else
+            getgenv().LyraHub.selectedParts.BracoDireito = nil
+        end
+    end
+})
+
+AvatarTab:TextBox({
+    Title = "ID do Braço Esquerdo",
+    PlaceholderText = "Digite o ID",
+    Callback = function(value)
+        if value ~= "" then
+            getgenv().LyraHub.selectedParts.BracoEsquerdo = tonumber(value) or 0
+        else
+            getgenv().LyraHub.selectedParts.BracoEsquerdo = nil
+        end
+    end
+})
+
+AvatarTab:TextBox({
+    Title = "ID da Perna Direita",
+    PlaceholderText = "Digite o ID",
+    Callback = function(value)
+        if value ~= "" then
+            getgenv().LyraHub.selectedParts.PernaDireita = tonumber(value) or 0
+        else
+            getgenv().LyraHub.selectedParts.PernaDireita = nil
+        end
+    end
+})
+
+AvatarTab:TextBox({
+    Title = "ID da Perna Esquerda",
+    PlaceholderText = "Digite o ID",
+    Callback = function(value)
+        if value ~= "" then
+            getgenv().LyraHub.selectedParts.PernaEsquerda = tonumber(value) or 0
+        else
+            getgenv().LyraHub.selectedParts.PernaEsquerda = nil
+        end
+    end
+})
+
+AvatarTab:TextBox({
+    Title = "ID da Cabeça",
+    PlaceholderText = "Digite o ID",
+    Callback = function(value)
+        if value ~= "" then
+            getgenv().LyraHub.selectedParts.Cabeca = tonumber(value) or 0
+        else
+            getgenv().LyraHub.selectedParts.Cabeca = nil
+        end
+    end
+})
+
+AvatarTab:Section({ Title = "Equipar Partes" })
+
+local partDropdown = AvatarTab:Dropdown({
+    Title = "Selecionar Parte",
+    Options = {"Tronco", "Braço Direito", "Braço Esquerdo", "Perna Direita", "Perna Esquerda", "Cabeça"},
+    Default = "Tronco",
+    Callback = function(name)
+        getgenv().LyraHub.parteSelecionada = name
+    end
+})
+
+AvatarTab:Button({
+    Title = "Equipar Parte Selecionada",
+    Callback = function()
+        local parts = {0, 0, 0, 0, 0, 0}
+        local selected = getgenv().LyraHub.parteSelecionada
+        local selectedParts = getgenv().LyraHub.selectedParts
+        
+        if selected == "Tronco" and selectedParts.Torso then
+            parts[1] = selectedParts.Torso
+        elseif selected == "Braço Direito" and selectedParts.BracoDireito then
+            parts[2] = selectedParts.BracoDireito
+        elseif selected == "Braço Esquerdo" and selectedParts.BracoEsquerdo then
+            parts[3] = selectedParts.BracoEsquerdo
+        elseif selected == "Perna Direita" and selectedParts.PernaDireita then
+            parts[4] = selectedParts.PernaDireita
+        elseif selected == "Perna Esquerda" and selectedParts.PernaEsquerda then
+            parts[5] = selectedParts.PernaEsquerda
+        elseif selected == "Cabeça" and selectedParts.Cabeca then
+            parts[6] = selectedParts.Cabeca
+        end
+        
+        changeCharacterBody(parts)
+    end
+})
+
+AvatarTab:Button({
+    Title = "Carregar Todas as Partes",
+    Callback = function()
+        local parts = {
+            getgenv().LyraHub.selectedParts.Torso or 0,
+            getgenv().LyraHub.selectedParts.BracoDireito or 0,
+            getgenv().LyraHub.selectedParts.BracoEsquerdo or 0,
+            getgenv().LyraHub.selectedParts.PernaDireita or 0,
+            getgenv().LyraHub.selectedParts.PernaEsquerda or 0,
+            getgenv().LyraHub.selectedParts.Cabeca or 0
+        }
+        changeCharacterBody(parts)
+    end
+})
+
+AvatarTab:Section({ Title = "Outros" })
+
+AvatarTab:Button({
+    Title = "Resetar Personagem",
+    Callback = function()
+        resetCharacter()
+    end
+})
+
+AvatarTab:Section({ Title = "FE: Fire Colors" })
+
+local fireColors = {
+    White = {id = "18637074370", code = "030FireWhite"},
+    Orange = {id = "18637025451", code = "031FireOrange"},
+    Green = {id = "18637078598", code = "032FireGreen"},
+    Blue = {id = "18637076370", code = "033FireBlue"},
+    Purple = {id = "18637070174", code = "034FirePurple"},
+    Black = {id = "18637072603", code = "035FireBlack"}
+}
+
+local fireDropdown = AvatarTab:Dropdown({
+    Title = "Fire Colors",
+    Options = {"White", "Orange", "Green", "Blue", "Purple", "Black"},
+    Default = "White",
+    Callback = function(name)
+        getgenv().LyraHub.selectedFireColor = name
+    end
+})
+
+AvatarTab:Button({
+    Title = "Equip Fire Color",
+    Callback = function()
+        local color = fireColors[getgenv().LyraHub.selectedFireColor]
+        if color then
+            applyEmmiter(color.id, color.code)
+        end
+    end
+})
+
+AvatarTab:Section({ Title = "FE: Smoke Colors" })
+
+local smokeColors = {
+    White = {id = "18637791748", code = "080SmokeWhite"},
+    Yellow = {id = "18637800482", code = "081SmokeYellow"},
+    Orange = {id = "18637793920", code = "082SmokeOrange"},
+    Green = {id = "18637789299", code = "083SmokeGreen"},
+    Blue = {id = "18637803021", code = "084SmokeBlue"},
+    Purple = {id = "18637813360", code = "085SmokePurple"},
+    Red = {id = "18637796598", code = "086SmokeRed"},
+    Black = {id = "18637798529", code = "087SmokeBlack"}
+}
+
+local smokeDropdown = AvatarTab:Dropdown({
+    Title = "Smoke Colors",
+    Options = {"White", "Yellow", "Orange", "Green", "Blue", "Purple", "Red", "Black"},
+    Default = "White",
+    Callback = function(name)
+        getgenv().LyraHub.selectedSmokeColor = name
+    end
+})
+
+AvatarTab:Button({
+    Title = "Equip Smoke Color",
+    Callback = function()
+        local color = smokeColors[getgenv().LyraHub.selectedSmokeColor]
+        if color then
+            applyEmmiter(color.id, color.code)
+        end
+    end
+})
+
+-- ============================================
+-- GAMEPASS TAB
+-- ============================================
+
+GamepassTab:Section({ Title = "Gamepass" })
+
+-- Avatares
+local avatars = {
+    {"Gato", "18863879460"},
+    {"Galo", "134279966389194"},
+    {"Coruja", "16259522726"},
+    {"Capivara", "123881270149502"},
+    {"Peixe", "100767254038825"},
+    {"Rato", "94426045122131"},
+    {"Fantasma", "15294031319"},
+    {"Arvore", "91559013873343"},
+    {"Formiga", "117567910327875"},
+    {"Frango", "12151793832"},
+    {"Pinguin", "94944293759578"},
+    {"Sapo", "108623435649969"},
+    {"Bruxo", "18459833677"},
+    {"Burro", "133145533787450"},
+    {"Nemo", "91530170242128"},
+    {"Dino", "11941741105"},
+    {"Coelho", "71797333686800"},
+    {"Tigre", "119471161887334"},
+    {"Pepino Doidao", "140311949273388"},
+    {"Balao Cachorro", "87116547256834"},
+    {"Urso Pelucia", "130455255821318"},
+    {"Minecraft", "18161752527"},
+    {"Fofuxo", "13354344881"},
+    {"Rato Grande", "18843948073"},
+    {"Careca desenho KKKKK", "114218821771642"},
+    {"Mini Sherek", "121680981245369"},
+    {"Tung Saur", "117098257036480"},
+    {"Tralaleiro", "99459753608381"},
+    {"Monstro S.A", "123609977175226"},
+    {"Trenzinho", "80468697076178"},
+    {"Pou idoso", "15742966010"},
+    {"Coco/boxt@", "77013984520332"},
+    {"Hipopótamo", "73215892129281"},
+    {"Pato(a)", "134082579"},
+    {"Inpostor", "18656467256"},
+    {"Sid", "77506186615650"},
+    {"Simon amarelo", "120960401202173"},
+    {"Simon azul", "75183593514657"},
+    {"Gato fei", "87442757321244"},
+    {"Noob Invertido", "135132836238349"},
+    {"Mosquito grande", "106596990206151"},
+    {"Cachorro Chihuahua", "108052868536435"},
+    {"Ratatui", "111436158728716"},
+    {"Puga grande", "18994959003"},
+    {"Gato sla", "18234669337"},
+    {"SHREK AMALDIÇOADO", "71251793812515"},
+    {"Galinha", "76155710249925"},
+    {"Pepa pig", "92979204778377"}
+}
+
+for _, avatar in ipairs(avatars) do
+    GamepassTab:Button({
+        Title = avatar[1],
+        Callback = function()
+            wearAccessory(avatar[2])
+        end
+    })
+end
+
+-- ============================================
+-- CAR TAB
+-- ============================================
+
+CarTab:Section({ Title = "Controles do Carro" })
+
+CarTab:TextBox({
+    Title = "Velocidade MaxSpeed",
+    Default = "25",
+    Callback = function(value)
+        local speed = tonumber(value)
+        if speed then
+            getgenv().LyraHub.carSpeed = speed
+        end
+    end
+})
+
+CarTab:Button({
+    Title = "Aplicar Velocidade",
+    Callback = function()
+        local vehicles = Workspace:FindFirstChild("Vehicles")
+        if vehicles then
+            for _, vehicle in ipairs(vehicles:GetChildren()) do
+                if vehicle:FindFirstChild("Seats") then
+                    local seat = vehicle.Seats:FindFirstChild("VehicleSeat")
+                    if seat then
+                        local maxSpeed = seat:FindFirstChild("MaxSpeed")
+                        if maxSpeed then
+                            maxSpeed.Value = getgenv().LyraHub.carSpeed or 25
+                        end
+                        local turbo = seat:FindFirstChild("Turbo")
+                        if turbo then
+                            turbo.Value = 0
+                        end
+                    end
+                end
+            end
+        end
+    end
+})
+
+CarTab:TextBox({
+    Title = "Potencia Turbo",
+    Default = "0",
+    Callback = function(value)
+        local turbo = tonumber(value)
+        if turbo then
+            local vehicles = Workspace:FindFirstChild("Vehicles")
+            if vehicles then
+                for _, vehicle in ipairs(vehicles:GetChildren()) do
+                    if vehicle:FindFirstChild("Seats") then
+                        local seat = vehicle.Seats:FindFirstChild("VehicleSeat")
+                        if seat then
+                            local turboVal = seat:FindFirstChild("Turbo")
+                            if turboVal then
+                                turboVal.Value = turbo
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+})
+
+CarTab:Section({ Title = "Decal Pneu" })
+
+CarTab:TextBox({
+    Title = "ID do decal",
+    PlaceholderText = "Digite o ID do decal",
+    Callback = function(value)
+        if value and value ~= "" then
+            local re = getRE()
+            if re then
+                -- Tentar aplicar decal
+                local remotes = getRemotes()
+                if remotes then
+                    local applyEvent = remotes:FindFirstChild("ApplyStateToVehicle")
+                    if applyEvent then
+                        applyEvent:InvokeServer(nil, {
+                            Appearance = {
+                                WheelDecal = value
+                            }
+                        })
+                    end
+                end
+            end
+        end
+    end
+})
+
+CarTab:Section({ Title = "Ações" })
+
+CarTab:Button({
+    Title = "Car Bring",
+    Callback = function()
+        -- Implementação simplificada
+        print("Car Bring")
+    end
+})
+
+CarTab:Button({
+    Title = "Car Kill",
+    Callback = function()
+        print("Car Kill")
+    end
+})
+
+CarTab:Toggle({
+    Title = "Car RGB",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                local re = getRE()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    if re then
+                        local colorEvent = re:FindFirstChild("1Player1sCa1r")
+                        if colorEvent then
+                            local color = Color3.fromHSV(tick() * (getgenv().LyraHub.rgbSpeed or 1) % 5 / 5, 1, 1)
+                            colorEvent:FireServer("PickingCarColor", color)
+                        end
+                    end
+                    task.wait(0.05)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+-- ============================================
+-- PROPS TAB
+-- ============================================
+
+PropsTab:Section({ Title = "Props" })
+
+PropsTab:Button({
+    Title = "Clear All Props",
+    Callback = function()
+        local re = getRE()
+        if re then
+            local clearEvent = re:FindFirstChild("1Clea1rTool1s")
+            if clearEvent then
+                clearEvent:FireServer("ClearAllProps")
+            end
+        end
+    end
+})
+
+PropsTab:Button({
+    Title = "Clear All Tools",
+    Callback = function()
+        clearAllTools()
+    end
+})
+
+PropsTab:Toggle({
+    Title = "Ant props (só funciona com house)",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    -- Remover props
+                    local re = getRE()
+                    if re then
+                        local clearEvent = re:FindFirstChild("1Clea1rTool1s")
+                        if clearEvent then
+                            clearEvent:FireServer("ClearAllProps")
+                        end
+                    end
+                    task.wait(5)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+-- ============================================
+-- CONFIG FLINGS TAB
+-- ============================================
+
+local trollTarget = nil
+local viewConnection = nil
+local loopTPActive = false
+local autoFlingActive = false
+local flingMethod = "Couch"
+
+ConfigFlingsTab:Section({ Title = "flingsTab" })
+
+-- Seleção de Alvo
+ConfigFlingsTab:Section({ Title = "Seleção de Alvo" })
+
+local targetDropdown = ConfigFlingsTab:Dropdown({
+    Title = "Target",
+    Options = getPlayerList(),
+    Default = "",
+    Callback = function(name)
+        if name ~= "Nenhum jogador" then
+            trollTarget = name
+            getgenv().LyraHub.Target = name
+        else
+            trollTarget = nil
+            getgenv().LyraHub.Target = nil
+        end
+    end
+})
+
+ConfigFlingsTab:Button({
+    Title = "Atualizar Lista",
+    Callback = function()
+        local newList = getPlayerList()
+        pcall(function() targetDropdown:Refresh(newList) end)
+    end
+})
+
+-- Atualizar automaticamente
+Players.PlayerAdded:Connect(function()
+    wait(1)
+    local newList = getPlayerList()
+    pcall(function() targetDropdown:Refresh(newList) end)
+end)
+
+Players.PlayerRemoving:Connect(function()
+    wait(0.5)
+    local newList = getPlayerList()
+    pcall(function() targetDropdown:Refresh(newList) end)
+end)
+
+-- Métodos
+ConfigFlingsTab:Section({ Title = "Métodos" })
+
+local methodDropdown = ConfigFlingsTab:Dropdown({
+    Title = "Method",
+    Options = {"Couch", "Ball", "Boat", "PoliceBoat", "Bus", "TowTruck"},
+    Default = "Couch",
+    Callback = function(name)
+        flingMethod = name
+    end
+})
+
+-- Ações
+ConfigFlingsTab:Section({ Title = "Ações" })
+
+ConfigFlingsTab:Button({
+    Title = "Kill",
+    Callback = function()
+        if not trollTarget or trollTarget == "" then return end
+        local target = Players:FindFirstChild(trollTarget)
+        if target then
+            killPlayer(target)
+        end
+    end
+})
+
+ConfigFlingsTab:Button({
+    Title = "Bring",
+    Callback = function()
+        if not trollTarget or trollTarget == "" then return end
+        local target = Players:FindFirstChild(trollTarget)
+        if target then
+            bringPlayer(target)
+        end
+    end
+})
+
+ConfigFlingsTab:Button({
+    Title = "Go To",
+    Callback = function()
+        if not trollTarget or trollTarget == "" then return end
+        local target = Players:FindFirstChild(trollTarget)
+        if target then
+            goToPlayer(target)
+        end
+    end
+})
+
+-- Toggles
+ConfigFlingsTab:Section({ Title = "Toggles" })
+
+ConfigFlingsTab:Toggle({
+    Title = "View",
+    Default = false,
+    Callback = function(state)
+        if state then
+            if not trollTarget or trollTarget == "" then return end
+            viewConnection = RunService.Heartbeat:Connect(function()
+                local target = Players:FindFirstChild(trollTarget)
+                if target and target.Character then
+                    local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        Camera.CameraSubject = humanoid
+                    end
+                end
+            end)
+        else
+            if viewConnection then
+                viewConnection:Disconnect()
+                viewConnection = nil
+            end
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    Camera.CameraSubject = humanoid
+                end
+            end
+        end
+    end
+})
+
+ConfigFlingsTab:Toggle({
+    Title = "Auto Fling",
+    Default = false,
+    Callback = function(state)
+        autoFlingActive = state
+        if state then
+            task.spawn(function()
+                while autoFlingActive do
+                    if trollTarget and trollTarget ~= "" then
+                        local target = Players:FindFirstChild(trollTarget)
+                        if target then
+                            killPlayer(target)
+                        end
+                    end
+                    task.wait(3)
+                end
+            end)
+        end
+    end
+})
+
+ConfigFlingsTab:Toggle({
+    Title = "Loop TP To Player",
+    Default = false,
+    Callback = function(state)
+        loopTPActive = state
+        if state then
+            task.spawn(function()
+                while loopTPActive do
+                    if trollTarget and trollTarget ~= "" then
+                        local target = Players:FindFirstChild(trollTarget)
+                        if target and target.Character then
+                            local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+                            local localHRP = getHRP(LocalPlayer)
+                            if targetHRP and localHRP then
+                                localHRP.CFrame = targetHRP.CFrame
+                            end
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        end
+    end
+})
+
+-- Glitch/Fling
+ConfigFlingsTab:Section({ Title = "Glitch/Fling" })
+
+ConfigFlingsTab:Button({
+    Title = "Glitch/Fling Couch",
+    Callback = function()
+        if not trollTarget or trollTarget == "" then return end
+        local target = Players:FindFirstChild(trollTarget)
+        if target then
+            flingWithCouch(target)
+        end
+    end
+})
+
+ConfigFlingsTab:Toggle({
+    Title = "Fling Couch Rápido",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.flingCouchFastActiveAll = state
+        if state then
+            task.spawn(function()
+                while getgenv().LyraHub.flingCouchFastActiveAll do
+                    if trollTarget and trollTarget ~= "" then
+                        local target = Players:FindFirstChild(trollTarget)
+                        if target then
+                            flingWithCouch(target)
+                        end
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        end
+    end
+})
+
+ConfigFlingsTab:Toggle({
+    Title = "Fling Ball Aura",
+    Default = false,
+    Callback = function(state)
+        if state then
+            task.spawn(function()
+                while getgenv().LyraHub.AntiToolSingleActive do
+                    if trollTarget and trollTarget ~= "" then
+                        local target = Players:FindFirstChild(trollTarget)
+                        if target then
+                            flingWithBall(target)
+                        end
+                    end
+                    task.wait(2)
+                end
+            end)
+        end
+        getgenv().LyraHub.AntiToolSingleActive = state
+    end
+})
+
+ConfigFlingsTab:Toggle({
+    Title = "Fling Couch Rápido (Todos Jogadores)",
+    Default = false,
+    Callback = function(state)
+        getgenv().LyraHub.flingCouchFastActiveAll = state
+        if state then
+            task.spawn(function()
+                while getgenv().LyraHub.flingCouchFastActiveAll do
+                    for _, player in ipairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer and player.Character then
+                            flingWithCouch(player)
+                        end
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        end
+    end
+})
+
+-- ============================================
+-- STALKING TAB
+-- ============================================
+
+StalkingTab:Section({ Title = "Stalking" })
+
+local stalkTarget = nil
+local stalkConnection = nil
+local stalkRandomActive = false
+
+local stalkDropdown = StalkingTab:Dropdown({
+    Title = "Selecionar Jogador",
+    Options = getPlayerList(),
+    Default = "",
+    Callback = function(name)
+        if name ~= "Nenhum jogador" then
+            stalkTarget = name
+        else
+            stalkTarget = nil
+        end
+    end
+})
+
+StalkingTab:Button({
+    Title = "Atualizar Lista",
+    Callback = function()
+        local newList = getPlayerList()
+        pcall(function() stalkDropdown:Refresh(newList) end)
+    end
+})
+
+StalkingTab:Toggle({
+    Title = "View Player",
+    Default = false,
+    Callback = function(state)
+        if state then
+            if not stalkTarget or stalkTarget == "" then return end
+            stalkConnection = RunService.Heartbeat:Connect(function()
+                local target = Players:FindFirstChild(stalkTarget)
+                if target and target.Character then
+                    local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        Camera.CameraSubject = humanoid
+                    end
+                end
+            end)
+        else
+            if stalkConnection then
+                stalkConnection:Disconnect()
+                stalkConnection = nil
+            end
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    Camera.CameraSubject = humanoid
+                end
+            end
+        end
+    end
+})
+
+StalkingTab:Toggle({
+    Title = "Stalk Player",
+    Default = false,
+    Callback = function(state)
+        if state then
+            if not stalkTarget or stalkTarget == "" then return end
+            stalkConnection = RunService.Heartbeat:Connect(function()
+                local target = Players:FindFirstChild(stalkTarget)
+                if target and target.Character then
+                    local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+                    local localHRP = getHRP(LocalPlayer)
+                    if targetHRP and localHRP then
+                        localHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 3)
+                    end
+                end
+            end)
+        else
+            if stalkConnection then
+                stalkConnection:Disconnect()
+                stalkConnection = nil
+            end
+        end
+    end
+})
+
+StalkingTab:Button({
+    Title = "Stalk Random Player",
+    Callback = function()
+        local players = Players:GetPlayers()
+        local valid = {}
+        for _, player in ipairs(players) do
+            if player ~= LocalPlayer and player.Character then
+                table.insert(valid, player)
+            end
+        end
+        if #valid > 0 then
+            local random = valid[math.random(1, #valid)]
+            stalkTarget = random.Name
+            pcall(function() stalkDropdown:Set(random.Name) end)
+        end
+    end
+})
+
+StalkingTab:Button({
+    Title = "Toggle Click TP",
+    Callback = function()
+        -- Implementar click TP
+        print("Toggle Click TP")
+    end
+})
+
+-- ============================================
+-- SCRIPTS TAB
+-- ============================================
+
+ScriptsTab:Section({ Title = "Scripts" })
+
+local scripts = {
+    {"Infinite Yield", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
+    {"Fly GUI V3", "https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"},
+    {"18+", "https://pastefy.app/Q2hQnsbr/raw"},
+    {"Bring Parts", "https://raw.githubusercontent.com/Bac0nHck/Scripts/main/BringFlingPlayers"},
+    {"Reverse", "https://raw.githubusercontent.com/0Ben1/fe./main/L"},
+}
+
+for _, scriptData in ipairs(scripts) do
+    ScriptsTab:Button({
+        Title = scriptData[1],
+        Callback = function()
+            loadstring(game:HttpGet(scriptData[2]))()
+        end
+    })
+end
+
+-- ============================================
+-- ANIMATIONS TAB
+-- ============================================
+
+AnimationsTab:Section({ Title = "Animações" })
+
+local function applyAnimation(animId)
+    local char = LocalPlayer.Character
+    if not char then return end
+    
+    local animate = char:FindFirstChild("Animate")
+    if not animate then return end
+    
+    animate.Disabled = true
+    
+    local animTypes = {"idle", "walk", "run", "jump", "fall", "climb"}
+    for _, animType in ipairs(animTypes) do
+        local animFolder = animate:FindFirstChild(animType)
+        if animFolder then
+            for _, anim in ipairs(animFolder:GetChildren()) do
+                if anim:IsA("Animation") then
+                    anim.AnimationId = "rbxassetid://" .. animId
+                end
+            end
+        end
+    end
+    
+    animate.Disabled = false
+    
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end
+
+local animations = {
+    {"Zombie", "18537376492"},
+    {"Adidas", "18537376492"},
+    {"Hero", "616111295"},
+    {"Mage", "707742142"},
+    {"Vampire", "1083445855"},
+    {"Ghost", "616006778"},
+    {"Toy", "782841498"},
+    {"Elder", "845397899"},
+    {"Levitation", "616006778"},
+    {"Pirate", "750781874"},
+    {"Cartoon", "742637544"},
+    {"Knight", "657595757"},
+    {"Piccolo (Early)", "658409194"},
+}
+
+for _, animData in ipairs(animations) do
+    AnimationsTab:Button({
+        Title = animData[1] .. " Animation",
+        Callback = function()
+            applyAnimation(animData[2])
+        end
+    })
+end
+
+-- ============================================
+-- SCRIPTS FE TAB
+-- ============================================
+
+ScriptsFeTab:Section({ Title = "Scripts FE" })
+
+local feScripts = {
+    {"Saibaman FE", "https://pastefy.app/AOMdfsmS/raw"},
+    {"Raditz FE", "https://pastefy.app/pTRAlAOA/raw"},
+    {"Yamcha FE", "https://pastefy.app/q5NWwGt0/raw"},
+    {"Tenshinhan FE", "https://pastefy.app/qKtZk8WA/raw"},
+    {"Naruto FE", "https://raw.githubusercontent.com/mxskf/Legal/refs/heads/main/Dboas"},
+    {"Sonic.Exe FE", "https://raw.githubusercontent.com/mxskf/Legal/refs/heads/main/Dboas86"},
+    {"Batman FE", "https://raw.githubusercontent.com/mxskf/Legal/refs/heads/main/Dboas89"},
+    {"Kamui", "https://raw.githubusercontent.com/yeahblxr/Scripts/refs/heads/main/Edge.lua"},
+    {"Emotes FE", "https://raw.githubusercontent.com/Gazer-Ha/Free-emote/refs/heads/main/Delta%20mad%20stuffs"},
+    {"Minecraft FE", ""},
+    {"DemonGorgon FE", ""},
+    {"Alastor FE", ""},
+    {"Slenderman FE", ""},
+    {"Sonic Metal FE", ""},
+    {"John Doe FE", ""},
+    {"Ominitrix FE", ""},
+    {"Jerk FE", ""},
+    {"C00lkid FE", ""},
+    {"Drone do Lyra", ""},
+}
+
+for _, scriptData in ipairs(feScripts) do
+    ScriptsFeTab:Button({
+        Title = scriptData[1],
+        Callback = function()
+            if scriptData[2] and scriptData[2] ~= "" then
+                loadstring(game:HttpGet(scriptData[2]))()
+            else
+                print("Script não disponível: " .. scriptData[1])
+            end
+        end
+    })
+end
+
+-- ============================================
+-- SOUNDS TAB
+-- ============================================
+
+SoundsTab:Section({ Title = "Músicas" })
+
+local function playSound(soundId)
+    local re = getRE()
+    if re then
+        local soundEvent = re:FindFirstChild("1Gu1nSound1s", true)
+        if soundEvent then
+            soundEvent:FireServer(Workspace, soundId, 1)
+        end
+    end
+end
+
+SoundsTab:TextBox({
+    Title = "ID da Música",
+    PlaceholderText = "Digite o ID da música",
+    Callback = function(value)
+        if value and value ~= "" then
+            getgenv().LyraHub.audioSelectedMusic = value
+        end
+    end
+})
+
+SoundsTab:Button({
+    Title = "Tocar Música",
+    Callback = function()
+        if getgenv().LyraHub.audioSelectedMusic then
+            playSound(getgenv().LyraHub.audioSelectedMusic)
+        end
+    end
+})
+
+SoundsTab:Button({
+    Title = "Parar Música",
+    Callback = function()
+        for _, sound in ipairs(Workspace:GetDescendants()) do
+            if sound:IsA("Sound") then
+                sound:Stop()
+                sound:Destroy()
+            end
+        end
+    end
+})
+
+-- Músicas rápidas
+SoundsTab:Section({ Title = "Músicas Rápidas" })
+
+local musicList = {
+    {"É pra apanhar e ficar calado", "79520567252414"},
+    {"Zé da Manga", "124420331692210"},
+    {"Lá Ele", "84193217395790"},
+    {"Receba", "84342842607926"},
+    {"Cala a Boca Kenga", "86494561679259"},
+    {"Pancada do Chaves", "135082533097287"},
+    {"Cavalo", "5134648778"},
+    {"Cat Laugh Meme", "18854692077"},
+    {"Loud Jumpscare", "7236490488"},
+    {"Risada do Sonic Exe", "7337298420"},
+    {"Grito do Sonic Exe", "146563959"},
+    {"Ai meu C*", "88347533205938"},
+    {"Ez", "18603736229"},
+    {"Vine Boom Meme", "18984970630"},
+    {"Bruh Meme", "6349641063"},
+    {"Oxe Cadê meu Frango?", "76088410130739"},
+    {"Vou Nada", "18702236441"},
+    {"Explosão", "7405939280"},
+    {"Ohhh My God Meme", "7836929130"},
+    {"Aughhhhh Meme", "102325287973230"},
+    {"Olha a Mensagem", "17780313297"},
+    {"Bora Bill", "17822597588"},
+    {"Notificação do WhatsApp", "18808571870"},
+    {"Kleberiano e seu Presidente", "85919013678918"},
+    {"O que eu fiz desgraçado", "73951202577593"},
+    {"Parowwww", "71768583581267"},
+    {"Eu já joguei todos eles", "72976103862201"},
+    {"Eu gosto é assim, amostradinho", "75501632675949"},
+    {"Eu sou Samurai", "95779977008485"},
+    {"Flamengo", "83209327610828"},
+    {"Pipipipipipi", "123505593557440"},
+    {"E quem disse que isso é problema meu?", "9063453269"},
+    {"Toma", "124516464058089"},
+    {"Toma (Seu Madruga)", "114636341953322"},
+    {"Tu é doido", "124567830301951"},
+    {"Meu fi quer Jogar de Bola?", "98584020142549"},
+    {"Nossa (Seu Madruga)", "17654670293"},
+    {"Ohhhh My PC", "107412810787615"},
+    {"Siren Head Call", "5681392704"},
+    {"Goat Man (I See You)", "104569727573321"},
+    {"Cave Dweller", "120482191380512"},
+    {"Man Form The Fog Spawn", "98222659370267"},
+    {"Jumpscare 1", "5351101493"},
+    {"Jumpscare 2", "18925320031"},
+    {"Help Me", "4617513181"},
+    {"Demon Scream 1", "5832059740"},
+    {"Robot Pain", "7043924315"},
+    {"Horror Sound 1", "4737106301"},
+    {"380 HZ", "6486261822"},
+    {"1 HZ", "128118682266898"},
+    {"Não, não (Chaves)", "74393167344888"},
+    {"Chupeta", "132235711219080"},
+    {"Freeza, por que você matou o Kuririn?", "74563462700748"},
+    {"E morreu", "71700111426066"},
+    {"Faz o L", "94350012510206"},
+    {"The Rake Scream 1", "72171849228899"},
+    {"The Rake Scream 2", "18967004856"},
+    {"Super Scream 1", "9043345011"},
+    {"Super Scream 2", "9043345012"},
+    {"Super Scream 3", "108336423519786"},
+    {"Super Scream 4", "9043345135"},
+    {"Super Scream 5", "104868924499219"},
+    {"Super Mario 64 Fall Scream", "1973317014"},
+    {"Seu Cérebro é Burro", "82284055473737"},
+    {"Ui Ele Gosta", "138936629170553"},
+    {"Dança Gatinho, Dança", "112244173773874"},
+    {"Ai Lula (Kleberiano)", "18585340476"},
+    {"Por favor, me ajuda (Lula)", "100644063890026"},
+    {"Fala Baixo", "85146723313238"},
+    {"É o Menino de Papai é?", "117434960434893"},
+    {"Deita Aqui", "86126187308121"},
+    {"Slk, Não Compensa", "101242461910421"},
+    {"Prowler Sound 1", "8374059857"},
+    {"Prowler Sound 2", "82132507008392"},
+    {"Buhhhh (Minguado)", "83788010495185"},
+    {"Huggy Wuggy Jumpscare", "8051776431"},
+    {"Poppy Playtime Alarme", "75246199058473"},
+    {"Huggy Wuggy Roar", "127588576195602"},
+    {"Trovão", "99936497230394"},
+    {"Oiia Oiia", "104483584177040"},
+    {"Hahahaha (Meme)", "113174873617518"},
+    {"HAHAHAHA", "8496017782"},
+    {"Engole o Choro e Faz o L", "82364726700315"},
+    {"Coca Cola Espuma", "92175423082594"},
+    {"Dbz Punch Sound", "441202925"},
+    {"Tá Travando", "112442884771932"},
+    {"Chavooo", "87096180148960"},
+    {"Rapaz ele tá sem Zap", "99782709356719"},
+    {"The Boiled One", "137177653817621"},
+    {"I Ghost The Down Cool", "84663543883498"},
+    {"Toma Jack no Sol Quente", "97476487963273"},
+    {"Chicken Jockey", "109689455115234"},
+    {"The Nether", "92539999916114"},
+    {"Flint and Steel", "121022461879318"},
+    {"Rápido, eu não quero morrer", "76119124192580"},
+    {"Ai Ai Ai", "127588453749028"},
+    {"Ai Chega Chega", "96649978398443"},
+    {"Ai Meu C*zinho", "113413619114733"},
+    {"Uhg! Yamete Kudasai!", "108494476595033"},
+    {"Pelo Jeito ela tá querendo", "94395705857835"},
+    {"É que eu tô meio gripadinha", "17496716711"},
+    {"Bença pai", "117339139267570"},
+    {"Você deve se matar agora", "102918849275968"},
+    {"Ah cala essa boca", "130313998778694"},
+    {"Devia ter uma lei", "116683015063357"},
+    {"Fui Tapeado", "130905328878700"},
+    {"bell sound", "78781475442496"},
+    {"VOCÊ TA FUDIDO EU VO LHE PEGÁ", "100496102114196"},
+    {"danger alarm meme", "9068077052"},
+    {"mango screen", "15798534597"},
+    {"planktoon", "127758670731005"},
+    {"HE HE HE HA", "93779555057888"},
+    {"fnaf VHS", "114242051346896"},
+    {"UROOOOOOOOOOOOH", "17681652807"},
+    {"EA E E AEEAE", "4159840042"},
+    {"Skibididadom dara BOOOM", "100835951102315"},
+    {"goofy laugh meme", "129392228554178"},
+    {"i wanna run away", "125579008816192"},
+    {"ahhh! neko", "78225137918378"},
+    {"Fall meme", "18835374228"},
+    {"ultra fart meme", "130894250173559"},
+    {"AHHHHHHHHH", "108269317221407"},
+    {"Quem e o louco entre nós", "106958630419629"},
+}
+
+for _, musicData in ipairs(musicList) do
+    SoundsTab:Button({
+        Title = musicData[1],
+        Callback = function()
+            playSound(musicData[2])
+        end
+    })
+end
+
+-- ============================================
+-- TELEPORTS TAB
+-- ============================================
+
+TeleportsTab:Section({ Title = "Teleports" })
+
+local locations = {
+    {"Morro", -348.64, 65.94, -458.08},
+    {"Praça", -26.17, 2.92, -102.16},
+    {"Banco", -1403.6, 3.4, 236.65},
+    {"Hospital", -303.2, 3.48, -107.07},
+    {"Prefeitura", -354.65, 4.32, -190.64},
+    {"Fazenda", -766.41, 2.92, -61.1},
+    {"Mercado", 16.31, 3.32, -348.64},
+    {"Shopping", 151.05, 3.32, 13.74},
+    {"Aeroporto", 290.23, 2.94, 42.57},
+    {"Hotel", 159.1, 3.4, 2.94},
+    {"Beira-mar 1", 55.69, 2.94, 3.32},
+    {"Beira-mar 2", 42.39, 2.94, 7.32},
+}
+
+local selectedLocation = "Morro"
+
+local locationDropdown = TeleportsTab:Dropdown({
+    Title = "Selecionar Local",
+    Options = (function()
+        local names = {}
+        for _, loc in ipairs(locations) do
+            table.insert(names, loc[1])
+        end
+        return names
+    end)(),
+    Default = "Morro",
+    Callback = function(name)
+        selectedLocation = name
+    end
+})
+
+TeleportsTab:Button({
+    Title = "Teleportar",
+    Callback = function()
+        local loc = nil
+        for _, l in ipairs(locations) do
+            if l[1] == selectedLocation then
+                loc = l
+                break
+            end
+        end
+        
+        if loc then
+            local localHRP = getHRP(LocalPlayer)
+            if localHRP then
+                localHRP.CFrame = CFrame.new(Vector3.new(loc[2], loc[3], loc[4]))
+            end
+        end
+    end
+})
+
+-- ============================================
+-- SHADERS TAB
+-- ============================================
+
+ShadersTab:Section({ Title = "Shaders" })
+
+local shaderActive = false
+local shaderInstances = {}
+
+ShadersTab:Toggle({
+    Title = "Shaders v2",
+    Default = false,
+    Callback = function(state)
+        shaderActive = state
+        
+        if state then
+            -- Salvar configurações originais
+            getgenv().OriginalLightingSettings = {
+                Brightness = Lighting.Brightness,
+                ColorShift_Bottom = Lighting.ColorShift_Bottom,
+                ColorShift_Top = Lighting.ColorShift_Top,
+                OutdoorAmbient = Lighting.OutdoorAmbient,
+                ClockTime = Lighting.ClockTime,
+                FogColor = Lighting.FogColor,
+                FogEnd = Lighting.FogEnd,
+                FogStart = Lighting.FogStart,
+                ExposureCompensation = Lighting.ExposureCompensation,
+                ShadowSoftness = Lighting.ShadowSoftness,
+                Ambient = Lighting.Ambient
+            }
+            
+            -- Aplicar novas configurações
+            Lighting.Brightness = 2.14
+            Lighting.ColorShift_Bottom = Color3.fromRGB(11, 0, 20)
+            Lighting.ColorShift_Top = Color3.fromRGB(240, 127, 14)
+            Lighting.OutdoorAmbient = Color3.fromRGB(34, 0, 49)
+            Lighting.ClockTime = 6.7
+            Lighting.FogColor = Color3.fromRGB(94, 76, 106)
+            Lighting.FogEnd = 1000
+            Lighting.FogStart = 0
+            Lighting.ExposureCompensation = 0.24
+            Lighting.ShadowSoftness = 0
+            Lighting.Ambient = Color3.fromRGB(59, 33, 27)
+            
+            -- Criar efeitos
+            local bloom = Instance.new("BloomEffect")
+            bloom.Intensity = 0.1
+            bloom.Threshold = 0
+            bloom.Size = 100
+            bloom.Parent = Lighting
+            table.insert(shaderInstances, bloom)
+            
+            local blur = Instance.new("BlurEffect")
+            blur.Size = 2
+            blur.Parent = Lighting
+            table.insert(shaderInstances, blur)
+            
+            local colorCorrection = Instance.new("ColorCorrectionEffect")
+            colorCorrection.Saturation = 0.05
+            colorCorrection.TintColor = Color3.fromRGB(255, 224, 219)
+            colorCorrection.Parent = Lighting
+            table.insert(shaderInstances, colorCorrection)
+            
+            local sunRays = Instance.new("SunRaysEffect")
+            sunRays.Intensity = 0.05
+            sunRays.Parent = Lighting
+            table.insert(shaderInstances, sunRays)
+            
+        else
+            -- Restaurar configurações originais
+            local original = getgenv().OriginalLightingSettings
+            if original then
+                Lighting.Brightness = original.Brightness or 1
+                Lighting.ColorShift_Bottom = original.ColorShift_Bottom or Color3.new(0, 0, 0)
+                Lighting.ColorShift_Top = original.ColorShift_Top or Color3.new(0, 0, 0)
+                Lighting.OutdoorAmbient = original.OutdoorAmbient or Color3.new(0, 0, 0)
+                Lighting.ClockTime = original.ClockTime or 14
+                Lighting.FogColor = original.FogColor or Color3.new(191, 191, 191)
+                Lighting.FogEnd = original.FogEnd or 100000
+                Lighting.FogStart = original.FogStart or 0
+                Lighting.ExposureCompensation = original.ExposureCompensation or 0
+                Lighting.ShadowSoftness = original.ShadowSoftness or 0.5
+                Lighting.Ambient = original.Ambient or Color3.new(0, 0, 0)
+            end
+            
+            -- Remover efeitos
+            for _, instance in ipairs(shaderInstances) do
+                instance:Destroy()
+            end
+            shaderInstances = {}
+        end
+    end
+})
+
+-- ============================================
+-- INICIALIZAÇÃO
+-- ============================================
+
+print("Lyra Hub carregado com sucesso!")
+
+-- Atualizar listas periodicamente
+task.spawn(function()
+    while true do
+        task.wait(30)
+        local newList = getPlayerList()
+        pcall(function() 
+            targetDropdown:Refresh(newList)
+            avatarDropdown:Refresh(newList)
+            stalkDropdown:Refresh(newList)
+            antiToolDropdown:Refresh(newList)
+        end)
+    end
+end)
