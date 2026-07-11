@@ -1,8 +1,10 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/tiololo487/Tiololo/refs/heads/main/Library"))()
+-- Carrega a library e guarda na variável 'BlackUI' (ou o nome que preferir)
+local BlackUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/tiololo487/Tiololo/refs/heads/main/Library"))()
 
-local Window = WindUI:CreateWindow({
+-- Agora usa a variável 'BlackUI' para criar a window
+local Window = BlackUI:CreateWindow({
     Title = "|Tijolo | Hub|",
-    Icon = "moon",
+    Icon = "moon", -- Nota: ícones geralmente são "rbxassetid://numero" ou URLs
     Theme = "Dark",
     Folder = "Tijolo"
 })
